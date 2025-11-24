@@ -1,0 +1,42 @@
+name: CI workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    # Esegue tutti gli 'steps' all'interno di questo container Docker preconfigurato
+    container: python:3.9-slim
+
+    steps:
+      - name: Checkout
+        # Clona il codice sorgente (il repository) nell'ambiente di esecuzione
+        uses: actions/checkout@v3
+        
+      - name: Install dependencies
+        # Esegue i comandi per aggiornare pip e installare tutte le dipendenze
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # Installa anche flake8, necessario per il linting
+          pip install flake8
+          # Installa Nose (o nosetests), necessario per i test unitari
+          pip install nose
+      - name: Lint with flake8
+        # Esegue i comandi di linting Flake8 specificati:
+        # 1. Controlla errori critici (E9, F63, F7, F82) e mostra il codice sorgente in caso di errore.
+        # 2. Controlla la complessità massima (10) e la lunghezza massima della riga (127).
+        run: |
+          flake8 service --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 service --count --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Run unit tests with nose
+        # Esegue i test con Nose, fornendo un output dettagliato e calcolando la copertura del codice.
+        run: nosetests -v --with-spec --spec-color --with-coverage --cover-package=app          
