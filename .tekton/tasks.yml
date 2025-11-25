@@ -16,15 +16,7 @@ spec:
         - name: WORKSPACE_SOURCE_PATH
           value: $(workspaces.source.path)
           
-      workingDir: $(workspaces.source.path)
-      
-      # IMPORNTANTE: Configurazione per OpenShift per evitare l'errore "violates PodSecurity" 
-      # e permettere l'esecuzione del container come utente root (uid 0), 
-      # essenziale per il Task Tekton di pulizia in ambienti restrittivi.
-      securityContext:
-        runAsNonRoot: false
-        runAsUser: 0
-        
+      workingDir: $(workspaces.source.path)        
       script: |
         #!/usr/bin/env sh
         # Lo script deve essere robusto per rimuovere il contenuto del volume montato
